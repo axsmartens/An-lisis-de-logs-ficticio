@@ -1,0 +1,151 @@
+ Informe de Análisis de Logs 
+
+ 
+
+Tecnologías utilizadas por el atacante 
+
+Durante el período analizado, se identificó el uso de múltiples herramientas de escaneo y enumeración por parte de la IP 192.168.153.2, todas ampliamente conocidas en el ámbito de pruebas de penetración y hacking ético: 
+
+ 
+
+Nmap Scripting Engine: Utilizado para enviar solicitudes OPTIONS y POST, con el objetivo de mapear servicios disponibles y detectar vulnerabilidades mediante scripts automatizados. 
+
+ 
+
+Nikto v2.1.6: Herramienta de escaneo web que realiza pruebas exhaustivas sobre servidores HTTP, buscando configuraciones inseguras, archivos expuestos y vulnerabilidades conocidas. 
+
+ 
+
+DirBuster: Empleada para descubrir directorios ocultos o sensibles mediante fuerza bruta, lo que permite al atacante acceder a rutas no indexadas. 
+
+ 
+
+WhatWeb: Utilizada para identificar tecnologías web presentes en el servidor (CMS, frameworks, versiones de software, etc.). 
+
+ 
+
+Además, se observó el uso de user-agents falsificados, como "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", una técnica común para simular navegadores obsoletos y evadir filtros modernos o reglas de seguridad basadas en agentes. 
+
+ 
+
+Actividades detectadas en los logs 
+
+Se recopilaron exclusivamente las peticiones que devolvieron código de estado HTTP 200 OK, lo que indica que el servidor procesó correctamente cada solicitud. Aunque esto no confirma la ejecución exitosa de los exploits, sí demuestra que el servidor no bloqueó ni rechazó los intentos, lo cual representa un riesgo considerable. 
+
+ 
+
+Entre las actividades más relevantes se destacan: 
+
+1. Intentos de explotación de Shellshock 
+
+Se detectaron payloads específicos para las vulnerabilidades CVE-2014-6271 y CVE-2014-6278, conocidas como Shellshock. 
+
+Estas vulnerabilidades afectan al intérprete Bash en sistemas Unix/Linux y permiten la ejecución remota de comandos si el servidor es vulnerable. 
+
+Ejemplo de payload: 
+
+bash 
+
+"() { :; }; echo 93e4r0-CVE-2014-6271: true; echo; echo;" 
+
+ 
+
+2. Pruebas de evasión y manipulación de rutas 
+
+Se observaron solicitudes como: 
+
+Código 
+
+GET // HTTP/1.1 
+
+GET /%2e/ HTTP/1.1 
+
+GET //////////////////////////////////////////////////////////////////... HTTP/1.1 
+
+Estas técnicas buscan evadir reglas de seguridad, acceder a rutas protegidas o provocar comportamientos inesperados en el servidor. 
+
+ 
+
+3. Pruebas de XSS (Cross-Site Scripting) 
+
+Se detectó una inyección de JavaScript en parámetros de URL: 
+
+Código 
+
+GET /?mod=<script>alert(document.cookie)</script>&op=browse 
+
+El objetivo es verificar si el servidor refleja contenido sin sanitizar, lo que permitiría al atacante robar cookies o manipular sesiones de usuarios. 
+
+Activación de modo de depuración SQL 
+
+Solicitud sospechosa: 
+
+Código 
+
+GET /?sql_debug=1 
+
+Si el servidor responde con información adicional, podría revelar detalles internos de la base de datos, estructuras de tablas o errores SQL. 
+
+ 
+
+5. Identificación de funciones internas de PHP 
+
+Se enviaron GUIDs específicos que corresponden a funciones como phpinfo() y php_logo_guid, lo cual permite confirmar la presencia de PHP y su versión. 
+
+ 
+
+6. Intentos de acceso a archivos del sistema 
+
+Ejemplo: 
+
+Código 
+
+GET /?pattern=/etc/*&sort=name 
+
+Este tipo de solicitud busca listar archivos del sistema operativo, lo que podría derivar en una vulnerabilidad de Local File Inclusion (LFI) o Directory Traversal. 
+
+ 
+
+7. Acceso a recursos estáticos 
+
+Se accedió a rutas como /site/js/, /icons/*.gif, /site/internal/, lo que indica una exploración de contenido público y posiblemente sensible. 
+
+ 
+
+Evaluación del riesgo 
+
+La combinación de herramientas utilizadas, la intensidad de las pruebas y la variedad de técnicas aplicadas indican que la IP 192.168.153.2 no estaba realizando una navegación legítima, sino una auditoría agresiva con fines maliciosos o de intrusión. 
+
+El hecho de que todas las solicitudes hayan recibido respuesta 200 OK sugiere que el servidor: 
+
+No cuenta con un WAF (Web Application Firewall) activo. 
+
+No tiene configuradas reglas de detección de intrusos (IDS/IPS). 
+
+Podría estar ejecutando versiones vulnerables de software. 
+
+ 
+
+Recomendaciones 
+
+Bloquear inmediatamente la IP ofensiva en el firewall o proxy inverso. 
+
+Revisar los logs del sistema operativo para detectar ejecución de comandos, procesos sospechosos o modificaciones de archivos. 
+
+Verificar versiones de Bash, PHP y otros servicios para confirmar si son vulnerables. 
+
+Implementar un WAF con reglas específicas para bloquear payloads conocidos como Shellshock, XSS y LFI. 
+
+Realizar un escaneo interno del servidor para detectar archivos modificados, puertas traseras o accesos no autorizados. 
+
+Aplicar parches de seguridad y actualizar todos los componentes del stack tecnológico. 
+
+Limitar el acceso a rutas internas y desactivar funciones innecesarias, como phpinfo() en producción. 
+
+ 
+
+Conclusión 
+
+La IP 192.168.153.2 representa una amenaza grave para la seguridad del servidor y, por extensión, para la organización. El comportamiento registrado en los logs demuestra una campaña sistemática de reconocimiento y explotación, con el objetivo de identificar vulnerabilidades y obtener acceso no autorizado. 
+
+Aunque no se puede confirmar una intrusión exitosa únicamente con los datos analizados, la respuesta positiva del servidor ante cada intento exige una investigación forense detallada y la implementación urgente de medidas de mitigación. 
