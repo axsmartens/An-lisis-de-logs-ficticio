@@ -1,0 +1,16 @@
+Luego de haber trabajado en la identificación de activos críticos y en el
+análisis de riesgos informáticos sobre el equipamiento de la empresa
+ficticia Auto Novo Ltda., la dirección ha avanzado con algunas
+recomendaciones técnicas. Sin embargo, el área de seguridad todavía no
+cuenta con herramientas automatizadas ni procedimientos robustos de
+monitoreo.
+Durante esta semana, se reportó una interrupción en el servicio web
+corporativo, alojado en un servidor Debian que no contaba con
+actualizaciones recientes. Tras una revisión preliminar, el equipo de
+infraestructura identificó indicios de una posible intrusión y generó un
+archivo de logs (access.log.1) con los registros de acceso del servidor
+Apache
+
+Debes analizar el archivo, detectar eventos inusuales, patrones
+sospechosos o indicios de ataque, y elaborar un informe técnico con
+hallazgos y recomendaciones para reforzar la seguridad operativa
